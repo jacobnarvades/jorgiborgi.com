@@ -8,6 +8,9 @@ Journal posts and projects live in the `POSTS` and `PROJECTS` arrays near the bo
 
 ## Deploy
 
+Pushing to `main` deploys automatically (Cloudflare Workers Builds runs
+`npx wrangler deploy`). To deploy manually from this folder:
+
 ```
 npx wrangler deploy
 ```
