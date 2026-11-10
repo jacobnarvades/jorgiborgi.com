@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>jacob narvades</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  /* Layout: single narrow column, pixel header (color strip + name + avatar), offset-shadow nav buttons, date/title rows. */
+  :root {
+    --bg: #ffffff;
+    --fg: #050203;
+    --muted: #672a48;
+    --rule: #050203;
+    --home: rgba(161,104,249,.25);
+    --journal: rgba(123,225,119,.25);
+    --projects: rgba(3,107,251,.25);
+    --dot: #a168f9;
+    --link-hover: #f93d8e;
+    --font-head: "VT323", "Courier New", monospace;
+    --font-body: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  }
+  :root, :root[data-theme] { color-scheme: light; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    padding-block: 56px 48px;
+    padding-left: max(24px, env(safe-area-inset-left, 0px));
+    padding-right: max(24px, env(safe-area-inset-right, 0px));
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  /* Header */
+  header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  .id { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .strip { display: flex; gap: 2px; height: 10px; }
+  .strip i { display: block; width: 20px; height: 10px; }
+  .strip i.gap { width: 18px; background: transparent; }
+  .strip:hover i:not(.gap) { animation: glitch .35s steps(2) 2; }
+  .strip i:nth-child(2n):not(.gap) { animation-delay: .07s; }
+  @keyframes glitch {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-3px); filter: hue-rotate(90deg); }
+    100% { transform: translateY(1px); }
+  }
+  h1 {
+    margin: 0;
+    font-family: var(--font-head);
+    font-weight: 400;
+    font-size: clamp(40px, 9vw, 52px);
+    line-height: 1;
+    letter-spacing: .01em;
+  }
+  .avatar {
+    flex: none;
+    width: 80px;
+    height: 64px;
+    image-rendering: pixelated;
+    object-fit: contain;
+  }
+  .avatar-slot {
+    flex: none;
+    width: 80px; height: 64px;
+    border: 1px dashed var(--rule);
+    display: grid; place-items: center;
+    font-family: var(--font-head);
+    font-size: 16px;
+    opacity: .5;
+  }
+
+  /* Nav buttons — Figma components 1–6 */
+  nav { display: flex; gap: 20px; flex-wrap: wrap; }
+  nav a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 116px;
+    height: 32px;
+    padding: 0 14px;
+    background: var(--bg);
+    color: var(--fg);
+    border: 1px solid var(--rule);
+    box-shadow: 3px 3px 0 0 var(--shadow);
+    font-family: var(--font-head);
+    font-size: 24px;
+    line-height: 1;
+    text-decoration: none;
+    transition: transform .08s, box-shadow .08s;
+  }
+  nav a[data-view="home"] { --shadow: var(--home); }
+  nav a[data-view="journal"] { --shadow: var(--journal); }
+  nav a[data-view="projects"] { --shadow: var(--projects); }
+  nav a:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 0 var(--shadow); }
+  nav a:active { transform: translate(3px,3px); box-shadow: 0 0 0 0 var(--shadow); }
+  nav a:focus-visible { outline: 2px dashed var(--link-hover); outline-offset: 4px; }
+  nav a .dot { display: none; width: 7px; height: 7px; border-radius: 50%; background: var(--dot); border: 1px solid var(--rule); }
+  nav a[aria-current="page"] .dot { display: block; }
+
+  /* Lists */
+  .list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: max-content 1fr; gap: 18px 20px; align-items: baseline; }
+  .list li { display: contents; }
+  .list a { min-width: 0; }
+  .date {
+    font-family: var(--font-head);
+    font-size: 22px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .list a, .prose a, footer a {
+    color: var(--fg);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+  .list a:hover, .prose a:hover, footer a:hover { color: var(--link-hover); }
+  .list a:focus-visible, .prose a:focus-visible, footer a:focus-visible { outline: 2px dashed var(--link-hover); outline-offset: 2px; }
+
+  h2 {
+    margin: 0;
+    font-family: var(--font-head);
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 1;
+  }
+  .section { display: flex; flex-direction: column; gap: 18px; }
+  .prose { max-width: 62ch; margin: 0; }
+  .prose p { margin: 0 0 1em; }
+  .muted { color: var(--muted); }
+
+  .projects { display: flex; flex-direction: column; gap: 22px; list-style: none; margin: 0; padding: 0; }
+  .projects li { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .projects .name { font-family: var(--font-head); font-size: 24px; line-height: 1.1; }
+  .projects .tag { font-size: 12px; color: var(--muted); }
+
+  .back { font-family: var(--font-head); font-size: 20px; }
+
+  footer {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--rule);
+    display: flex; flex-wrap: wrap; gap: 8px 24px;
+    font-size: 12px;
+  }
+
+  @media (max-width: 440px) {
+    nav { gap: 12px; }
+    nav a { min-width: 0; flex: 1; font-size: 20px; padding: 0 6px; }
+    .list { column-gap: 14px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .strip:hover i { animation: none; }
+    nav a { transition: none; }
+  }
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="id">
+      <div class="strip" aria-hidden="true">
+        <i style="background:#a168f9"></i><i style="background:#9ec5e2"></i><i style="background:#f6c0f8"></i><i style="background:#f93d8e"></i><i style="background:#036bfb"></i><i style="background:#06f895"></i><i style="background:#b3f2ad"></i><i style="background:#7be177"></i><i style="background:#f99fd1"></i><i class="gap"></i><i style="background:var(--fg)"></i>
+      </div>
+      <h1>jacob narvades</h1>
+    </div>
+  </header>
+
+  <nav aria-label="Site">
+    <a href="#home" data-view="home"><span class="dot"></span>Home</a>
+    <a href="#journal" data-view="journal"><span class="dot"></span>Journal</a>
+    <a href="#projects" data-view="projects"><span class="dot"></span>Projects</a>
+  </nav>
+
+  <main id="view"></main>
+
+  <footer>
+    <a href="https://x.com/chronicchroniko">x / @chronicchroniko</a>
+    <a href="https://www.lesswrong.com/users/jorgiborgi">lesswrong / jorgiborgi</a>
+  </footer>
+</div>
+
+<script>
+  // Edit your content here.
+  const POSTS = [
+    { slug: "making-a-website", date: "2026.3.15", title: "i am making a website rn", body: "" },
+    { slug: "brief-update", date: "2026.2.1", title: "brief update", body: "" },
+    { slug: "digital-brain", date: "2026.1.14", title: "how to make a digital brain", body: "" },
+  ];
+  const PROJECTS = [
+    { name: "judge exploitability", tag: "ml / alignment", text: "Predicting which LLM-judge biases actually get exploited when a policy is optimized against the judge." },
+    { name: "edit locality", tag: "ml / interpretability", text: "Where the collateral damage from knowledge edits in language models ends up." },
+    { name: "neurofin", tag: "neuroai", text: "Reddit comments in, predicted brain-region activations out, using an fMRI encoding model." },
+  ];
+
+  const view = document.getElementById("view");
+  const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+  const postList = posts => `<ul class="list">${posts.map(p =>
+    `<li><span class="date">${p.date}</span><a href="#${p.slug}">${esc(p.title)}</a></li>`).join("")}</ul>`;
+
+  const views = {
+    home: () => postList(POSTS),
+    journal: () => `<section class="section">
+        <h2>journal</h2>
+        <p class="prose muted">Notes on neuro, ML, and whatever I'm building.</p>
+        ${postList(POSTS)}
+      </section>`,
+    projects: () => `<section class="section">
+        <h2>projects</h2>
+        <ul class="projects">${PROJECTS.map(p =>
+          `<li><span class="name">${esc(p.name)}</span><span class="tag">${esc(p.tag)}</span><span>${esc(p.text)}</span></li>`).join("")}</ul>
+      </section>`,
+  };
+
+  function render() {
+    const key = (location.hash || "#home").slice(1);
+    const post = POSTS.find(p => p.slug === key);
+    const active = post ? "journal" : (views[key] ? key : "home");
+    document.querySelectorAll("nav a").forEach(a => {
+      if (a.dataset.view === active) a.setAttribute("aria-current", "page");
+      else a.removeAttribute("aria-current");
+    });
+    if (post) {
+      view.innerHTML = `<article class="section">
+          <a class="back" href="#journal">&larr; journal</a>
+          <span class="date">${post.date}</span>
+          <h2>${esc(post.title)}</h2>
+          <div class="prose">${post.body || '<p class="muted">Draft. Nothing published here yet.</p>'}</div>
+        </article>`;
+    } else {
+      view.innerHTML = views[active]();
+    }
+  }
+  window.addEventListener("hashchange", render);
+  render();
+</script>
+</body>
+</html>

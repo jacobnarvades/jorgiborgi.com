@@ -1,0 +1,11 @@
+{
+  "name": "jacob-site",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./public"
+  },
+  "routes": [
+    { "pattern": "jorgiborgi.com", "custom_domain": true },
+    { "pattern": "www.jorgiborgi.com", "custom_domain": true }
+  ]
+}
