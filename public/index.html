@@ -149,6 +149,7 @@
   .projects a.name { color: var(--fg); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
   .projects a.name:hover { color: var(--link-hover); }
   .projects a.name:focus-visible { outline: 2px dashed var(--link-hover); outline-offset: 2px; }
+  .projects video.demo { display: block; width: 100%; max-width: 640px; height: auto; aspect-ratio: 16 / 9; margin-top: 10px; border: 1px solid var(--fg); background: #FDFBD4; }
 
   .back { font-family: var(--font-head); font-size: 20px; }
 
@@ -205,7 +206,8 @@
     { slug: "digital-brain", date: "2026.1.14", title: "how to make a digital brain", body: "" },
   ];
   const PROJECTS = [
-    { name: "career forecasting", tag: "ml / careers", url: "https://forecasting.jorgiborgi.com", text: "Give it a career history and it forecasts the next role, seniority move, employer type and master's destination, with a timeline slider and what-if scenarios." },
+    { name: "career forecasting", tag: "ml / careers", url: "https://forecasting.jorgiborgi.com", text: "Give it a career history and it forecasts the next role, seniority move, employer type and master's destination, with a timeline slider and what-if scenarios.",
+      video: "/media/career-forecaster-demo.mp4", poster: "/media/career-forecaster-demo-poster.jpg", videoLabel: "Career Forecaster demo: a pasted LinkedIn profile, the forecast, rewinding the timeline, and a what-if job at Hugging Face" },
   ];
 
   const view = document.getElementById("view");
@@ -224,7 +226,7 @@
     projects: () => `<section class="section">
         <h2>projects</h2>
         <ul class="projects">${PROJECTS.map(p =>
-          `<li>${p.url ? `<a class="name" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.name)}</a>` : `<span class="name">${esc(p.name)}</span>`}<span class="tag">${esc(p.tag)}</span><span>${esc(p.text)}</span></li>`).join("")}</ul>
+          `<li>${p.url ? `<a class="name" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.name)}</a>` : `<span class="name">${esc(p.name)}</span>`}<span class="tag">${esc(p.tag)}</span><span>${esc(p.text)}</span>${p.video ? `<video class="demo" src="${esc(p.video)}" poster="${esc(p.poster || "")}" controls playsinline preload="none" aria-label="${esc(p.videoLabel || p.name)}"></video>` : ""}</li>`).join("")}</ul>
       </section>`,
   };
 
