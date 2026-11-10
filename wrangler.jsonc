@@ -1,8 +1,13 @@
 {
   "name": "jacob-site",
   "compatibility_date": "2026-10-01",
+  // Only /media/* runs the Worker (adds Range support for video);
+  // every other path is served straight from public/.
+  "main": "src/worker.js",
   "assets": {
-    "directory": "./public"
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/media/*"]
   },
   "routes": [
     { "pattern": "jorgiborgi.com", "custom_domain": true },

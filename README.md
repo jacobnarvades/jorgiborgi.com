@@ -1,6 +1,7 @@
 # jorgiborgi.com
 
 Personal site. Served by a Cloudflare Worker from the static files in `public/`.
+`src/worker.js` runs only for `/media/*`, adding HTTP Range support so videos play in Safari.
 
 ## Edit content
 
