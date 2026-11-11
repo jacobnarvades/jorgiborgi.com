@@ -151,6 +151,38 @@
   .projects a.name:focus-visible { outline: 2px dashed var(--link-hover); outline-offset: 2px; }
   .projects video.demo { display: block; width: 100%; max-width: 640px; height: auto; aspect-ratio: 16 / 9; margin-top: 10px; border: 1px solid var(--fg); background: #FDFBD4; }
 
+  /* Project pages */
+  .projects .more { font-size: 12px; }
+  .project-page h2 { font-size: 40px; }
+  .project-page .lede { font-size: 15px; }
+  .project-page h3.date { margin: 8px 0 0; font-family: var(--font-body); font-weight: 500; font-size: 15px; letter-spacing: .02em; }
+  .project-page .links { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 12px; }
+  .project-page .links a, .figure a { color: var(--fg); text-underline-offset: 3px; }
+  .project-page .links a:hover { color: var(--link-hover); }
+  .figure { position: relative; margin: 0; padding: 14px 16px 12px; border: 1px solid var(--rule); box-shadow: 3px 3px 0 0 var(--projects); background: var(--bg); }
+  .figure h3 { margin: 0 0 2px; font-family: var(--font-head); font-weight: 400; font-size: 24px; line-height: 1.1; }
+  .figure .sub { margin: 0 0 8px; font-size: 12px; color: var(--muted); }
+  .figure svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .figure svg text { font-family: var(--font-body); }
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0 0 6px; padding: 0; list-style: none; font-size: 12px; }
+  .legend li { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .sw { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .legend .sw.diamond { border-radius: 0; transform: rotate(45deg) scale(.8); background: var(--fg); }
+  .figure details { margin-top: 6px; font-size: 12px; }
+  .mini { margin: 8px 0 0; max-width: 640px; }
+  .mini svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .mini svg text { font-family: var(--font-body); }
+  .mini .legend { margin-top: 4px; }
+  .projects .mini .legend li { flex-direction: row; gap: 6px; }
+  .figure summary { cursor: pointer; color: var(--muted); }
+  .figure table { border-collapse: collapse; margin-top: 6px; font-size: 12px; font-variant-numeric: tabular-nums; }
+  .figure th, .figure td { padding: 3px 10px 3px 0; text-align: right; border-bottom: 1px dashed rgba(5,2,3,.2); }
+  .figure th:first-child, .figure td:first-child { text-align: left; }
+  .table-wrap { overflow-x: auto; }
+  .tip { position: absolute; pointer-events: none; background: var(--fg); color: #fff; font-size: 12px; line-height: 1.4; padding: 6px 8px; max-width: 240px; z-index: 2; }
+  .tip[hidden] { display: none; }
+  .hit { fill: transparent; cursor: default; }
+  .hit:hover + .row-hl, .row-hl.on { opacity: 1; }
   .back { font-family: var(--font-head); font-size: 20px; }
 
   footer {
@@ -201,16 +233,157 @@
 <script>
   // Edit your content here.
   const POSTS = [
-    { slug: "making-a-website", date: "2026.3.15", title: "i am making a website rn", body: "" },
-    { slug: "brief-update", date: "2026.2.1", title: "brief update", body: "" },
-    { slug: "digital-brain", date: "2026.1.14", title: "how to make a digital brain", body: "" },
+    { slug: "welcome", date: "2026.11.10", title: "welcome", body: "" },
   ];
   const PROJECTS = [
-    { name: "career forecasting", tag: "ml / careers", url: "https://forecasting.jorgiborgi.com", text: "Give it a career history and it forecasts the next role, seniority move, employer type and master's destination, with a timeline slider and what-if scenarios.",
+    { name: "career forecasting", tag: "predictive modeling / careers", url: "https://forecasting.jorgiborgi.com", text: "Paste a LinkedIn profile or drop in a resume, pick a dream company or grad program, and see how people with paths like yours got there: your role fit, the ladders they climbed, and your most likely next step. A forecast view predicts your next role, seniority move, employer type and master's or PhD school, with what-if scenarios. Built on ~3,500 career histories.",
       video: "/media/career-forecaster-demo-full.mp4", poster: "/media/career-forecaster-demo-full-poster.jpg", videoLabel: "Career Forecaster demo: a pasted LinkedIn profile, the forecast, rewinding the timeline, and a what-if job at Hugging Face" },
+    { name: "piru: dose timing fixes", tag: "open source / swift / pharmacology", page: "piru", mini: "piru", text: "Two merged fixes to Piru, an open-source app for tracking doses and medication timing: doses logged in grams were read as milligrams, and the effect curve peaked about two hours late." },
   ];
 
   const view = document.getElementById("view");
+  // ---------- Project pages ----------
+  // Edit the words here (your own writeup); the charts are drawn from the numbers below.
+  const PIRU_TEXT = {
+    lede: "I fixed two bugs in Piru, an open-source app for tracking doses and medication timing on iPhone, Apple Watch, Android and Mac, that made its estimate of how strongly a dose takes effect, and when, wrong.",
+    timing: "Piru's effect curve peaked late: a median of about 1.9 hours after each drug's measured peak blood level. I matched its absorption to each drug's own peak time while keeping the gradual onset of a swallowed pill. Across the 36 substances that could be checked, 35 now peak within five minutes of their measured peak.",
+    units: "Doses logged in grams or micrograms were read as milligrams, so 0.08 g was modelled as 0.08 mg, a thousand times too small. Every logged unit is now converted to milligrams first, using the same conversion the app already used elsewhere, so the same dose gives the same estimate however it is written.",
+  };
+  const PIRU_TIMING = [  // hours to peak feeling, from PR #19
+    { drug: "Paroxetine", dose: "50 mg", before: 3.33, after: 1.77, published: null },
+    { drug: "Sertraline", dose: "50 mg", before: 3.32, after: 1.78, published: null },
+    { drug: "Amphetamine", dose: "50 mg", before: 2.83, after: 1.58, published: null },
+    { drug: "Methylphenidate", dose: "60 mg", before: 2.72, after: 1.23, published: 1.5 },
+    { drug: "Tramadol", dose: "200 mg", before: 1.75, after: 0.93, published: null },
+  ];
+  const PIRU_UNITS = [  // the same 80 mg dose, as the model saw it (multiple of the real dose), from PR #17
+    { logged: "80 mg", before: 1, after: 1 },
+    { logged: "0.08 g", before: 0.001, after: 1 },
+    { logged: "80,000 µg", before: 1000, after: 1 },
+  ];
+  const BEFORE = "#f93d8e", AFTER = "#036bfb", INK = "#050203";
+
+  function timingChart() {
+    // Narrow screens get a narrower drawing so text stays readable instead of shrinking.
+    const narrow = window.innerWidth < 560;
+    const W = narrow ? 380 : 640, L = narrow ? 118 : 182, R = 16, top = 16, rowH = narrow ? 38 : 34, H = top + PIRU_TIMING.length * rowH + 30;
+    const x = h => L + (h / 3.5) * (W - L - R);
+    let g = "";
+    for (let h = 0; h <= 3; h++) g += `<line x1="${x(h)}" x2="${x(h)}" y1="${top - 6}" y2="${H - 26}" stroke="${INK}" stroke-opacity=".12"/><text x="${x(h)}" y="${H - 8}" font-size="12" fill="${INK}" fill-opacity=".7" text-anchor="middle">${h} h</text>`;
+    PIRU_TIMING.forEach((d, i) => {
+      const y = top + i * rowH + rowH / 2;
+      const tip = `${d.drug} ${d.dose}: estimated peak effect ${d.before.toFixed(2)} h after a dose before the fix, ${d.after.toFixed(2)} h after it`;
+      g += narrow
+        ? `<text x="0" y="${y - 2}" font-size="13" fill="${INK}">${d.drug}</text><text x="0" y="${y + 12}" font-size="11" fill="${INK}" fill-opacity=".6">${d.dose}</text>`
+        : `<text x="0" y="${y + 4}" font-size="13" fill="${INK}">${d.drug}</text><text x="${L - 10}" y="${y + 4}" font-size="11" fill="${INK}" fill-opacity=".6" text-anchor="end">${d.dose}</text>`;
+      g += `<line x1="${x(d.after)}" x2="${x(d.before)}" y1="${y}" y2="${y}" stroke="${INK}" stroke-opacity=".25" stroke-width="2"/>`;
+      g += `<circle cx="${x(d.before)}" cy="${y}" r="6" fill="${BEFORE}" stroke="#fff" stroke-width="2"/><circle cx="${x(d.after)}" cy="${y}" r="6" fill="${AFTER}" stroke="#fff" stroke-width="2"/>`;
+      g += `<rect class="hit" x="0" y="${y - rowH / 2}" width="${W}" height="${rowH}" data-tip="${tip}"/>`;
+    });
+    const rows = PIRU_TIMING.map(d => `<tr><td>${d.drug} ${d.dose}</td><td>${d.before.toFixed(2)}</td><td>${d.after.toFixed(2)}</td></tr>`).join("");
+    return `<figure class="figure" data-chart>
+      <h3>When does a dose feel strongest?</h3>
+      <p class="sub">Hours after a dose of five prescription medications, as Piru estimated. Each fixed curve now peaks at that drug's own measured peak blood level: 35 of the 36 drugs Piru models land within 5 minutes of it.</p>
+      <ul class="legend"><li><span class="sw" style="background:${BEFORE}"></span>Before the fix</li><li><span class="sw" style="background:${AFTER}"></span>After the fix</li></ul>
+      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Dumbbell chart: estimated hours to peak effect before and after the fix for five prescription medications; every peak moved about one to one and a half hours earlier.">${g}</svg>
+      <div class="tip" hidden></div>
+      <details><summary>Show the numbers</summary><div class="table-wrap"><table><thead><tr><th>Drug</th><th>Before (h)</th><th>After (h)</th></tr></thead><tbody>${rows}</tbody></table></div></details>
+    </figure>`;
+  }
+
+  function unitsChart() {
+    const narrow = window.innerWidth < 560;
+    const W = narrow ? 380 : 640, L = narrow ? 78 : 120, R = narrow ? 30 : 24, top = 30, rowH = 40, H = top + PIRU_UNITS.length * rowH + 30;
+    const x = v => L + ((Math.log10(v) + 3) / 6) * (W - L - R);
+    const ticks = window.innerWidth < 560 ? [[0.001, "1/1000×"], [1, "1×"], [1000, "1000×"]] : [[0.001, "1/1000×"], [0.01, "1/100×"], [0.1, "1/10×"], [1, "1×"], [10, "10×"], [100, "100×"], [1000, "1000×"]];
+    let g = "";
+    ticks.forEach(([v, t]) => g += `<line x1="${x(v)}" x2="${x(v)}" y1="${top - 8}" y2="${H - 26}" stroke="${INK}" stroke-opacity="${v === 1 ? .55 : .12}" ${v === 1 ? 'stroke-dasharray="4 4"' : ""}/><text x="${x(v)}" y="${H - 8}" font-size="11" fill="${INK}" fill-opacity=".7" text-anchor="middle">${t}</text>`);
+    g += `<text x="${x(1)}" y="${top - 14}" font-size="12" fill="${INK}" text-anchor="middle">the dose you took</text>`;
+    PIRU_UNITS.forEach((d, i) => {
+      const y = top + i * rowH + rowH / 2;
+      const wrong = d.before !== 1 ? (d.before < 1 ? "1,000× too small" : "1,000× too big") : "correct";
+      g += `<text x="0" y="${y + 4}" font-size="13" fill="${INK}">${d.logged}</text>`;
+      if (d.before !== 1) g += `<line x1="${x(d.before)}" x2="${x(d.after)}" y1="${y}" y2="${y}" stroke="${INK}" stroke-opacity=".25" stroke-width="2"/>`;
+      g += `<circle cx="${x(d.before)}" cy="${y}" r="6" fill="${BEFORE}" stroke="#fff" stroke-width="2"/><circle cx="${x(d.after)}" cy="${y}" r="6" fill="${AFTER}" stroke="#fff" stroke-width="2"/>`;
+      if (d.before !== 1) g += `<text x="${x(d.before) + (d.before < 1 ? 12 : -12)}" y="${y - 10}" font-size="11" fill="${INK}" text-anchor="${d.before < 1 ? "start" : "end"}">${wrong}</text>`;
+      else g += `<text x="${x(1) + 12}" y="${y + 4}" font-size="11" fill="${INK}" fill-opacity=".7">${narrow ? "already right" : "already right (before and after)"}</text>`;
+      g += `<rect class="hit" x="0" y="${y - rowH / 2}" width="${W}" height="${rowH}" data-tip="80 mg logged as ${d.logged}: modelled as ${d.before === 1 ? "80 mg" : d.before < 1 ? "0.08 mg" : "80,000 mg"} before the fix (${wrong}); 80 mg after"/>`;
+    });
+    return `<figure class="figure" data-chart>
+      <h3>The same dose, written three ways</h3>
+      <p class="sub">An 80 mg dose, and how much of it Piru's effect model thought you took.</p>
+      <ul class="legend"><li><span class="sw" style="background:${BEFORE}"></span>Before the fix</li><li><span class="sw" style="background:${AFTER}"></span>After the fix</li></ul>
+      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Dot chart on a log scale: before the fix, 0.08 g was modelled as a thousandth of the dose and 80,000 µg as a thousand times the dose; after the fix all three equal the dose taken.">${g}</svg>
+      <div class="tip" hidden></div>
+    </figure>`;
+  }
+
+
+  // Schematic effect-over-time curves for the typical drug, from the PR's summary numbers:
+  // the old curve peaked a median ~1.9 h after the measured peak; fixed curves land within 5 min.
+  function piruMini() {
+    const narrow = window.innerWidth < 560;  // narrower drawing keeps labels readable on phones
+    const W = narrow ? 380 : 640, H = narrow ? 130 : 150, pad = 10, T = 9;
+    const curve = tmax => {  // one-compartment shape (rise then decay) with peak at tmax, scaled to 1
+      const ke = 0.35; let lo = ke + 1e-3, hi = 50;
+      for (let i = 0; i < 60; i++) { const ka = (lo + hi) / 2; (Math.log(ka / ke) / (ka - ke) > tmax) ? (lo = ka) : (hi = ka); }
+      const ka = (lo + hi) / 2, f = t => Math.exp(-ke * t) - Math.exp(-ka * t), peak = f(tmax);
+      return t => f(t) / peak;
+    };
+    const x = t => pad + (t / T) * (W - 2 * pad), y = v => H - pad - v * (H - 2 * pad - 18);
+    const path = c => Array.from({ length: 121 }, (_, i) => { const t = (i / 120) * T; return `${i ? "L" : "M"}${x(t).toFixed(1)},${y(c(t)).toFixed(1)}`; }).join("");
+    const measured = curve(1.0), after = curve(1.06), before = curve(2.9);
+    const label = (t, text, dx, anchor) => `<text x="${x(t) + dx}" y="${y(1) - 6}" font-size="12" fill="${INK}" text-anchor="${anchor}">${text}</text>`;
+    return `<figure class="mini" aria-label="Schematic: Piru's old effect curve peaked about two hours after the measured peak; the fixed curve matches the measured curve.">
+      <svg viewBox="0 0 ${W} ${H}" role="img">
+        <line x1="${pad}" x2="${W - pad}" y1="${H - pad}" y2="${H - pad}" stroke="${INK}" stroke-opacity=".15"/>
+        <path d="${path(measured)}" fill="none" stroke="${INK}" stroke-width="2" stroke-dasharray="5 5" stroke-opacity=".7"/>
+        <path d="${path(before)}" fill="none" stroke="${BEFORE}" stroke-width="2"/>
+        <path d="${path(after)}" fill="none" stroke="${AFTER}" stroke-width="2"/>
+        ${narrow ? "" : label(1.03, "measured ≈ after fix", 0, "middle") + `<text x="${x(T) - 2}" y="${y(before(T)) - 10}" font-size="12" fill="${INK}" text-anchor="end">before fix</text>`}
+        <title>Effect over time, schematic: the old curve peaked about 1.9 hours late; after the fix it matches the measured timing.</title>
+      </svg>
+      <ul class="legend"><li><span class="sw" style="background:${INK};opacity:.7"></span>Measured</li><li><span class="sw" style="background:${BEFORE}"></span>Before fix</li><li><span class="sw" style="background:${AFTER}"></span>After fix</li></ul>
+    </figure>`;
+  }
+  const PAGES = {
+    piru: () => `<article class="section project-page">
+        <a class="back" href="#projects">&larr; projects</a>
+        <h2>piru</h2>
+        <span class="tag muted">open source / swift / pharmacology</span>
+        <p class="prose lede">${esc(PIRU_TEXT.lede)}</p>
+        <h3 class="date">1. timing</h3>
+        <p class="prose">${esc(PIRU_TEXT.timing)}</p>
+        ${timingChart()}
+        <h3 class="date">2. units</h3>
+        <p class="prose">${esc(PIRU_TEXT.units)}</p>
+        ${unitsChart()}
+        <div class="links">
+          <a href="https://github.com/kageroumado/piru/pull/19" target="_blank" rel="noopener">PR #19: timing</a>
+          <a href="https://github.com/kageroumado/piru/pull/17" target="_blank" rel="noopener">PR #17: units</a>
+          <a href="https://kagerou.glass/piru/" target="_blank" rel="noopener">about Piru</a>
+        </div>
+      </article>`,
+  };
+
+  // Hover tooltips for chart rows (touch: tap a row).
+  function wireCharts() {
+    document.querySelectorAll("[data-chart]").forEach(fig => {
+      const tip = fig.querySelector(".tip");
+      fig.querySelectorAll(".hit").forEach(hit => {
+        const show = e => {
+          tip.textContent = hit.dataset.tip; tip.hidden = false;
+          const box = fig.getBoundingClientRect(), p = e.touches ? e.touches[0] : e;
+          let left = p.clientX - box.left + 12; const top = p.clientY - box.top + 12;
+          if (left + 250 > box.width) left = Math.max(8, p.clientX - box.left - 250);
+          tip.style.left = left + "px"; tip.style.top = top + "px";
+        };
+        hit.addEventListener("mousemove", show); hit.addEventListener("click", show);
+        hit.addEventListener("mouseleave", () => { tip.hidden = true; });
+      });
+    });
+  }
+
   const esc = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
   const postList = posts => `<ul class="list">${posts.map(p =>
@@ -226,24 +399,28 @@
     projects: () => `<section class="section">
         <h2>projects</h2>
         <ul class="projects">${PROJECTS.map(p =>
-          `<li>${p.url ? `<a class="name" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.name)}</a>` : `<span class="name">${esc(p.name)}</span>`}<span class="tag">${esc(p.tag)}</span><span>${esc(p.text)}</span>${p.video ? `<video class="demo" src="${esc(p.video)}" poster="${esc(p.poster || "")}" controls playsinline preload="none" aria-label="${esc(p.videoLabel || p.name)}"></video>` : ""}</li>`).join("")}</ul>
+          `<li>${p.page ? `<a class="name" href="#${esc(p.page)}">${esc(p.name)}</a>` : p.url ? `<a class="name" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.name)}</a>` : `<span class="name">${esc(p.name)}</span>`}<span class="tag">${esc(p.tag)}</span><span>${esc(p.text)}</span>${p.mini === "piru" ? piruMini() : ""}${p.video ? `<video class="demo" src="${esc(p.video)}" poster="${esc(p.poster || "")}" controls playsinline preload="none" aria-label="${esc(p.videoLabel || p.name)}"></video>` : ""}</li>`).join("")}</ul>
       </section>`,
   };
 
   function render() {
     const key = (location.hash || "#home").slice(1);
     const post = POSTS.find(p => p.slug === key);
-    const active = post ? "journal" : (views[key] ? key : "home");
+    const page = PAGES[key];
+    const active = post ? "journal" : page ? "projects" : (views[key] ? key : "home");
     document.querySelectorAll("nav a").forEach(a => {
       if (a.dataset.view === active) a.setAttribute("aria-current", "page");
       else a.removeAttribute("aria-current");
     });
+    if (page) {
+      view.innerHTML = page(); wireCharts(); window.scrollTo(0, 0); return;
+    }
     if (post) {
       view.innerHTML = `<article class="section">
           <a class="back" href="#journal">&larr; journal</a>
           <span class="date">${post.date}</span>
           <h2>${esc(post.title)}</h2>
-          <div class="prose">${post.body || '<p class="muted">Draft. Nothing published here yet.</p>'}</div>
+          <div class="prose">${post.body || ""}</div>
         </article>`;
     } else {
       view.innerHTML = views[active]();
