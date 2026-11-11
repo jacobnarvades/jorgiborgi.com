@@ -330,17 +330,19 @@
       const ka = (lo + hi) / 2, f = t => Math.exp(-ke * t) - Math.exp(-ka * t), peak = f(tmax);
       return t => f(t) / peak;
     };
-    const x = t => pad + (t / T) * (W - 2 * pad), y = v => H - pad - v * (H - 2 * pad - 18);
+    const x = t => pad + (t / T) * (W - 2 * pad), y = v => H - pad - v * (H - 2 * pad - 30);  // headroom keeps labels clear of the peaks
     const path = c => Array.from({ length: 121 }, (_, i) => { const t = (i / 120) * T; return `${i ? "L" : "M"}${x(t).toFixed(1)},${y(c(t)).toFixed(1)}`; }).join("");
     const measured = curve(1.0), after = curve(1.06), before = curve(2.9);
-    const label = (t, text, dx, anchor) => `<text x="${x(t) + dx}" y="${y(1) - 6}" font-size="12" fill="${INK}" text-anchor="${anchor}">${text}</text>`;
+    // White outline under the text so a line never runs through the letters.
+    const halo = 'stroke="#fff" stroke-width="4" stroke-linejoin="round" paint-order="stroke"';
+    const label = (t, text, dx, anchor) => `<text x="${x(t) + dx}" y="${y(1) - 10}" font-size="12" fill="${INK}" text-anchor="${anchor}" ${halo}>${text}</text>`;
     return `<figure class="mini" aria-label="Schematic: Piru's old effect curve peaked about two hours after the measured peak; the fixed curve matches the measured curve.">
       <svg viewBox="0 0 ${W} ${H}" role="img">
         <line x1="${pad}" x2="${W - pad}" y1="${H - pad}" y2="${H - pad}" stroke="${INK}" stroke-opacity=".15"/>
         <path d="${path(measured)}" fill="none" stroke="${INK}" stroke-width="2" stroke-dasharray="5 5" stroke-opacity=".7"/>
         <path d="${path(before)}" fill="none" stroke="${BEFORE}" stroke-width="2"/>
         <path d="${path(after)}" fill="none" stroke="${AFTER}" stroke-width="2"/>
-        ${narrow ? "" : label(1.03, "measured ≈ after fix", 0, "middle") + `<text x="${x(T) - 2}" y="${y(before(T)) - 10}" font-size="12" fill="${INK}" text-anchor="end">before fix</text>`}
+        ${narrow ? "" : label(1.03, "measured ≈ after fix", 0, "middle") + `<text x="${x(T) - 2}" y="${y(before(T)) - 14}" font-size="12" fill="${INK}" text-anchor="end" ${halo}>before fix</text>`}
         <title>Effect over time, schematic: the old curve peaked about 1.9 hours late; after the fix it matches the measured timing.</title>
       </svg>
       <ul class="legend"><li><span class="sw" style="background:${INK};opacity:.7"></span>Measured</li><li><span class="sw" style="background:${BEFORE}"></span>Before fix</li><li><span class="sw" style="background:${AFTER}"></span>After fix</li></ul>
